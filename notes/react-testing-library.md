@@ -294,6 +294,46 @@ test('navbar toggles correctly', () => {
 });
 ```
 
+Axios API Tests:
+
+```javascript
+// Import the Axios module and the API function to be tested
+import Axios from 'axios';
+import { fetchData } from './api.index';
+
+// Mock Axios to prevent actual HTTP requests during testing
+jest.mock('axios');
+
+// Define test data
+const mockResponseData = { id: 1, name: 'Test User', email: 'test@example.com' };
+const mockApiResponse = { data: mockResponseData };
+
+// Define test cases
+describe('fetchData', () => {
+  it('fetches data successfully from the API', async () => {
+    // Mock Axios.get implementation to return a successful response
+    (Axios.get as jest.MockedFunction<typeof Axios.get>).mockResolvedValue(mockApiResponse);
+
+    // Call the API function
+    const response = await fetchData('param1', 'param2');
+
+    // Expectations
+    expect(response).toEqual(mockResponseData);
+    expect(Axios.get).toHaveBeenCalledWith('<endpoint>');
+  });
+
+  it('handles errors from the API', async () => {
+    // Mock Axios.get implementation to throw an error
+    (Axios.get as jest.MockedFunction<typeof Axios.get>).mockRejectedValue(new Error('API Error'));
+
+    // Call the API function
+    await expect(fetchData('param1', 'param2')).rejects.toThrow('API Error');
+  });
+});
+
+```
+
+
 ### Resources
 
 - [React Testing Library](https://www.youtube.com/watch?v=JBSUgDxICg8)
