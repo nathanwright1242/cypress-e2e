@@ -373,7 +373,46 @@ describe('fetchData', () => {
 
 ```
 
+```javascript
+// Import the API function to be tested
+import { fetchData } from './api.index';
+import axios from 'axios';
 
+// Mock the Axios module
+jest.mock('axios');
+
+// Define test data
+const mockResponseData = { id: 1, name: 'Test User', email: 'test@example.com' };
+const mockApiResponse = { data: mockResponseData };
+
+// Define test cases
+describe('fetchData', () => {
+  it('fetches data successfully from the API', async () => {
+    // Mock Axios.create().get implementation to return a successful response
+    (axios.create as jest.MockedFunction<typeof axios.create>).mockReturnValue({
+      get: jest.fn().mockResolvedValue(mockApiResponse)
+    });
+
+    // Call the API function
+    const response = await fetchData('param1', 'param2');
+
+    // Expectations
+    expect(response).toEqual(mockResponseData);
+    expect(axios.create().get).toHaveBeenCalledWith('<endpoint>');
+  });
+
+  it('handles errors from the API', async () => {
+    // Mock Axios.create().get implementation to throw an error
+    (axios.create as jest.MockedFunction<typeof axios.create>).mockReturnValue({
+      get: jest.fn().mockRejectedValue(new Error('API Error'))
+    });
+
+    // Call the API function
+    await expect(fetchData('param1', 'param2')).rejects.toThrow('API Error');
+  });
+});
+
+```
 ### Resources
 
 - [React Testing Library](https://www.youtube.com/watch?v=JBSUgDxICg8)
