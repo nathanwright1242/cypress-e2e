@@ -333,6 +333,46 @@ describe('fetchData', () => {
 
 ```
 
+```javascript
+// Import the API function to be tested
+import { fetchData } from './api.index';
+
+// Mock the Axios module
+jest.mock('axios', () => ({
+  create: jest.fn(() => ({
+    get: jest.fn(),
+  })),
+}));
+
+// Define test data
+const mockResponseData = { id: 1, name: 'Test User', email: 'test@example.com' };
+const mockApiResponse = { data: mockResponseData };
+
+// Define test cases
+describe('fetchData', () => {
+  it('fetches data successfully from the API', async () => {
+    // Mock Axios.create().get implementation to return a successful response
+    (axios.create().get as jest.Mock).mockResolvedValue(mockApiResponse);
+
+    // Call the API function
+    const response = await fetchData('param1', 'param2');
+
+    // Expectations
+    expect(response).toEqual(mockResponseData);
+    expect(axios.create().get).toHaveBeenCalledWith('<endpoint>');
+  });
+
+  it('handles errors from the API', async () => {
+    // Mock Axios.create().get implementation to throw an error
+    (axios.create().get as jest.Mock).mockRejectedValue(new Error('API Error'));
+
+    // Call the API function
+    await expect(fetchData('param1', 'param2')).rejects.toThrow('API Error');
+  });
+});
+
+```
+
 
 ### Resources
 
