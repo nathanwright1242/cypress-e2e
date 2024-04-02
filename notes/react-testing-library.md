@@ -413,6 +413,50 @@ describe('fetchData', () => {
 });
 
 ```
+
+```javascript
+import Axios from 'axios';
+import MockAdapter from 'axios-mock-adapter';
+import { initiatebuild } from './api'; // Assuming api.ts is where initiatebuild is defined
+
+describe('initiatebuild', () => {
+  let axiosMock: MockAdapter;
+
+  beforeEach(() => {
+    axiosMock = new MockAdapter(Axios);
+  });
+
+  afterEach(() => {
+    axiosMock.restore();
+  });
+
+  it('sends a POST request to the correct endpoint with provided data', async () => {
+    const data = { /* your test data */ };
+    const responseData = { /* mock response data */ };
+
+    axiosMock.onPost('<hostname>/cd-certification', data).reply(200, responseData);
+
+    const response = await initiatebuild(data);
+
+    expect(response.status).toBe(200);
+    expect(response.data).toEqual(responseData);
+  });
+
+  it('sends a POST request with default data when no data is provided', async () => {
+    const defaultData = {}; // Your default data object here
+
+    axiosMock.onPost('<hostname>/cd-certification', defaultData).reply(200, {});
+
+    const response = await initiatebuild();
+
+    expect(response.status).toBe(200);
+    // Add more assertions if necessary
+  });
+
+  // Add more test cases as needed
+});
+
+```
 ### Resources
 
 - [React Testing Library](https://www.youtube.com/watch?v=JBSUgDxICg8)
