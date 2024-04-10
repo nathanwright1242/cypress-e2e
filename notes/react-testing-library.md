@@ -457,6 +457,58 @@ describe('initiatebuild', () => {
 });
 
 ```
+Form Submissions
+
+```javascript
+import React from 'react';
+import { render, fireEvent, waitFor, act } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import YourComponent from './YourComponent'; // Import your component to be tested
+
+// Mock API function
+const mockStartCertificationProcess = jest.fn();
+
+jest.mock('./api', () => ({
+  startCertificationProcess: mockStartCertificationProcess
+}));
+
+describe('YourComponent', () => {
+  beforeEach(() => {
+    // Clear mock function calls before each test
+    mockStartCertificationProcess.mockClear();
+  });
+
+  it('submits the form with correct data', async () => {
+    const { getByLabelText, getByText, getByTestId } = render(<YourComponent />);
+
+    // Fill out form fields
+    fireEvent.change(getByLabelText('Test Artifact'), { target: { value: 'test artifact value' } });
+    fireEvent.change(getByLabelText('Field 1'), { target: { value: 'value 1' } });
+    // Add more fields as needed
+
+    // Mock the API call
+    mockStartCertificationProcess.mockResolvedValueOnce({ success: true });
+
+    // Submit the form
+    fireEvent.click(getByText('Submit'));
+
+    // Wait for the API call to be made
+    await waitFor(() => expect(mockStartCertificationProcess).toHaveBeenCalledTimes(1));
+
+    // Verify that the API was called with the correct data
+    expect(mockStartCertificationProcess).toHaveBeenCalledWith({
+      testArtifact: 'test artifact value',
+      field1: 'value 1'
+      // Add more fields as needed
+    });
+
+    // Assert success message or any other UI changes upon successful submission
+    expect(getByTestId('success-message')).toBeInTheDocument();
+  });
+});
+
+```
+
 ### Resources
 
 - [React Testing Library](https://www.youtube.com/watch?v=JBSUgDxICg8)
