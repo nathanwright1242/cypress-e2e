@@ -509,6 +509,54 @@ describe('YourComponent', () => {
 
 ```
 
+Utils 
+```javascript
+import { hasEmptyFields } from './utils'; // Adjust the import path as needed
+
+describe('hasEmptyFields', () => {
+  it('returns true if any field is empty', () => {
+    const obj = {
+      name: 'John',
+      age: 30,
+      email: '',
+    };
+    expect(hasEmptyFields(obj)).toBe(true);
+  });
+
+  it('returns false if all fields are filled', () => {
+    const obj = {
+      name: 'John',
+      age: 30,
+      email: 'john@example.com',
+    };
+    expect(hasEmptyFields(obj)).toBe(false);
+  });
+
+  it('returns false for an empty object', () => {
+    const obj = {};
+    expect(hasEmptyFields(obj)).toBe(false);
+  });
+
+  it('returns false for an object with only non-empty arrays', () => {
+    const obj = {
+      items: ['apple', 'banana'],
+      prices: [10, 20],
+    };
+    expect(hasEmptyFields(obj)).toBe(false);
+  });
+
+  it('returns true if any field is null or undefined', () => {
+    const obj = {
+      name: 'John',
+      age: null,
+      email: 'john@example.com',
+    };
+    expect(hasEmptyFields(obj)).toBe(true);
+  });
+});
+
+```
+
 ### Resources
 
 - [React Testing Library](https://www.youtube.com/watch?v=JBSUgDxICg8)
