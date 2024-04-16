@@ -50,11 +50,13 @@ export default CertificationDetails;
 ```
 
 ```javascript
+
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const DataTable = () => {
   const [data, setData] = useState([]);
+  const [polling, setPolling] = useState(true);
 
   useEffect(() => {
     // Function to fetch data
@@ -62,17 +64,28 @@ const DataTable = () => {
       try {
         const response = await axios.get('your-api-endpoint');
         setData(response.data);
+        // Check if the status is 'success' and stop polling if it is
+        if (response.data.status === 'success') {
+          setPolling(false);
+        }
       } catch (error) {
         console.error('Error fetching data: ', error);
       }
     };
 
-    // Call the function every 30 seconds
-    const intervalId = setInterval(fetchData, 30000);
+    let intervalId;
+    if (polling) {
+      // Call the function every 30 seconds
+      intervalId = setInterval(fetchData, 30000);
+    }
 
-    // Clean up the interval on component unmount
-    return () => clearInterval(intervalId);
-  }, []);
+    // Clean up the interval on component unmount or if polling stops
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [polling]); // Re-run effect if polling state changes
 
   // Render your table with the data
   return (
