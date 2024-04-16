@@ -48,3 +48,40 @@ const CertificationDetails = ({ certId }) => {
 export default CertificationDetails;
 
 ```
+
+```javascript
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+
+const DataTable = () => {
+  const [data, setData] = useState([]);
+
+  useEffect(() => {
+    // Function to fetch data
+    const fetchData = async () => {
+      try {
+        const response = await axios.get('your-api-endpoint');
+        setData(response.data);
+      } catch (error) {
+        console.error('Error fetching data: ', error);
+      }
+    };
+
+    // Call the function every 30 seconds
+    const intervalId = setInterval(fetchData, 30000);
+
+    // Clean up the interval on component unmount
+    return () => clearInterval(intervalId);
+  }, []);
+
+  // Render your table with the data
+  return (
+    <table>
+      {/* Render your table rows with the data here */}
+    </table>
+  );
+};
+
+export default DataTable;
+
+```
