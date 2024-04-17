@@ -98,3 +98,39 @@ const DataTable = () => {
 export default DataTable;
 
 ```
+
+bootstrap table css
+
+```css
+/* Base table styles */
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table th,
+.custom-table td {
+  padding: 8px;
+  border: 1px solid #ddd;
+}
+
+.custom-table th {
+  background-color: #f2f2f2;
+}
+
+/* Striped table styles */
+.custom-table-striped tbody tr:nth-child(odd) {
+  background-color: lightblue;
+}
+
+.custom-table-striped tbody tr:nth-child(even) {
+  background-color: white;
+}
+
+```
+
+```javascript
+<table className="custom-table custom-table-striped">
+  {/* Table content */}
+</table>
+```
