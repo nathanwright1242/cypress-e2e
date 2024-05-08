@@ -1,0 +1,47 @@
+```javascript
+ import React, { useState, useEffect } from 'react';
+
+const MyComponent = () => {
+  // State to store the fetched data
+  const [data, setData] = useState(null);
+  // State to manage loading state
+  const [loading, setLoading] = useState(true);
+
+  // Effect to fetch data when component mounts
+  useEffect(() => {
+    // Fetch data from an API
+    fetch('https://api.example.com/data')
+      .then(response => response.json())
+      .then(data => {
+        // Update state with fetched data
+        setData(data);
+        // Set loading to false once data is fetched
+        setLoading(false);
+      })
+      .catch(error => {
+        // Handle errors if any
+        console.error('Error fetching data:', error);
+        // Set loading to false if there's an error
+        setLoading(false);
+      });
+  }, []); // Empty dependency array to ensure effect runs only once on mount
+
+  return (
+    <div>
+      {/* Display loading message while data is being fetched */}
+      {loading ? <p>Loading...</p> : null}
+
+      {/* Display fetched data */}
+      {data && (
+        <div>
+          <h2>Data:</h2>
+          <pre>{JSON.stringify(data, null, 2)}</pre>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default MyComponent;
+
+```
