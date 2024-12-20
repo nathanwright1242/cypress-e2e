@@ -26,3 +26,13 @@ I prioritized fostering a collaborative and inclusive environment within my team
 ---
 
 This review highlights your technical contributions, the impact you had on stakeholders, and your leadership within the team. Would you like any further adjustments or additions?
+
+I hope this message finds you well. I am writing to formally raise a concern about my treatment during the 2023 performance review cycle, which I believe was unfairly compromised after I voiced concerns and expressed interest in internal mobility.
+
+Over the past four years, my performance has consistently been exemplary, with year-over-year results that speak for themselves. Additionally, feedback from peers and colleagues has been overwhelmingly positive, highlighting my contributions to team success, leadership abilities, and dedication to organizational goals.
+
+However, after raising valid concerns internally to upper management and expressing my aspirations for career growth, I noticed a significant and troubling shift in my manager's demeanor towards me. This culminated in a 2023 year-end review that did not accurately reflect my contributions and a bonus that was markedly reduced. Both outcomes have negatively impacted me financially and created an unwarranted blemish on my otherwise strong career trajectory.
+
+I firmly believe this situation does not align with the company's commitment to fairness and recognizing talent based on merit. It is well-documented that top talent often leaves organizations due to poor managerial practices. I value my role here and am eager to continue contributing meaningfully to the organization's success. I hope this matter can be reviewed and addressed appropriately to ensure such situations do not hinder the growth and morale of dedicated employees like myself.
+
+Thank you for your attention to this matter.
