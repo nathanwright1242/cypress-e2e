@@ -36,3 +36,5 @@ However, after raising valid concerns internally to upper management and express
 I firmly believe this situation does not align with the company's commitment to fairness and recognizing talent based on merit. It is well-documented that top talent often leaves organizations due to poor managerial practices. I value my role here and am eager to continue contributing meaningfully to the organization's success. I hope this matter can be reviewed and addressed appropriately to ensure such situations do not hinder the growth and morale of dedicated employees like myself.
 
 Thank you for your attention to this matter.
+
+I delayed raising this issue formally because I was initially focused on moving forward. However, this experience has continued to weigh on me, and I believe it is important to address the situation not only for my own peace of mind but also to uphold the principles of fairness and meritocracy that are integral to this organization.
