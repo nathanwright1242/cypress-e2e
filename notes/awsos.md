@@ -3,7 +3,27 @@ GET your-index-name/_search
   "size": 0,
   "aggs": {
     
-    // === USER ADOPTION Q1 ===
+    // === USER ADOPTION Q4 2024 ===
+    "q4_2024_users": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2024-10-01T00:00:00Z",
+            "lt": "2025-01-01T00:00:00Z"
+          }
+        }
+      },
+      "aggs": {
+        "unique_users": {
+          "cardinality": { "field": "userID.keyword" }
+        },
+        "total_events": {
+          "value_count": { "field": "eventId" }
+        }
+      }
+    },
+
+    // === USER ADOPTION Q1 2025 ===
     "q1_2025_users": {
       "filter": {
         "range": {
@@ -23,7 +43,7 @@ GET your-index-name/_search
       }
     },
 
-    // === USER ADOPTION Q2 ===
+    // === USER ADOPTION Q2 2025 ===
     "q2_2025_users": {
       "filter": {
         "range": {
@@ -43,8 +63,33 @@ GET your-index-name/_search
       }
     },
 
-    // === ROLE ADOPTION Q1 ===
-    "q1_role_adoption": {
+    // === ALL ROUTES Q4 2024 ===
+    "q4_2024_routes": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2024-10-01T00:00:00Z",
+            "lt": "2025-01-01T00:00:00Z"
+          }
+        }
+      },
+      "aggs": {
+        "all_routes": {
+          "terms": {
+            "field": "route.keyword",
+            "size": 1000
+          },
+          "aggs": {
+            "unique_users": {
+              "cardinality": { "field": "userID.keyword" }
+            }
+          }
+        }
+      }
+    },
+
+    // === ALL ROUTES Q1 2025 ===
+    "q1_2025_routes": {
       "filter": {
         "range": {
           "timestamp": {
@@ -54,10 +99,10 @@ GET your-index-name/_search
         }
       },
       "aggs": {
-        "by_role": {
+        "all_routes": {
           "terms": {
-            "field": "role.keyword",
-            "size": 20
+            "field": "route.keyword",
+            "size": 1000
           },
           "aggs": {
             "unique_users": {
@@ -68,8 +113,8 @@ GET your-index-name/_search
       }
     },
 
-    // === ROLE ADOPTION Q2 ===
-    "q2_role_adoption": {
+    // === ALL ROUTES Q2 2025 ===
+    "q2_2025_routes": {
       "filter": {
         "range": {
           "timestamp": {
@@ -79,10 +124,10 @@ GET your-index-name/_search
         }
       },
       "aggs": {
-        "by_role": {
+        "all_routes": {
           "terms": {
-            "field": "role.keyword",
-            "size": 20
+            "field": "route.keyword",
+            "size": 1000
           },
           "aggs": {
             "unique_users": {
@@ -93,62 +138,12 @@ GET your-index-name/_search
       }
     },
 
-    // === PAGE POPULARITY Q1 ===
-    "q1_page_popularity": {
-      "filter": {
-        "range": {
-          "timestamp": {
-            "gte": "2025-01-01T00:00:00Z",
-            "lt": "2025-04-01T00:00:00Z"
-          }
-        }
-      },
-      "aggs": {
-        "top_pages": {
-          "terms": {
-            "field": "page.keyword",
-            "size": 10
-          },
-          "aggs": {
-            "unique_users": {
-              "cardinality": { "field": "userID.keyword" }
-            }
-          }
-        }
-      }
-    },
-
-    // === PAGE POPULARITY Q2 ===
-    "q2_page_popularity": {
-      "filter": {
-        "range": {
-          "timestamp": {
-            "gte": "2025-04-01T00:00:00Z",
-            "lt": "2025-07-01T00:00:00Z"
-          }
-        }
-      },
-      "aggs": {
-        "top_pages": {
-          "terms": {
-            "field": "page.keyword",
-            "size": 10
-          },
-          "aggs": {
-            "unique_users": {
-              "cardinality": { "field": "userID.keyword" }
-            }
-          }
-        }
-      }
-    },
-
-    // === WEEKLY TRENDS (Both Quarters) ===
+    // === WEEKLY TRENDS (All 3 Quarters) ===
     "weekly_trends": {
       "filter": {
         "range": {
           "timestamp": {
-            "gte": "2025-01-01T00:00:00Z",
+            "gte": "2024-10-01T00:00:00Z",
             "lt": "2025-07-01T00:00:00Z"
           }
         }
@@ -157,8 +152,8 @@ GET your-index-name/_search
         "by_week": {
           "date_histogram": {
             "field": "timestamp",
-            "calendar_interval": "week",
-            "format": "yyyy-'W'ww"
+            "calendar_interval": "1w",
+            "format": "yyyy-MM-dd"
           },
           "aggs": {
             "unique_users": {
