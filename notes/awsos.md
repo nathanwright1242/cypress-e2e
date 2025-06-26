@@ -1,197 +1,149 @@
-```json
 GET your-index-name/_search
 {
   "size": 0,
   "aggs": {
     
-    // === USER ADOPTION COMPARISON ===
-    "user_adoption": {
-      "q1_2025_users": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-01-01T00:00:00Z",
-              "lt": "2025-04-01T00:00:00Z"
-            }
+    // === USER ADOPTION Q1 ===
+    "q1_2025_users": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2025-01-01T00:00:00Z",
+            "lt": "2025-04-01T00:00:00Z"
           }
+        }
+      },
+      "aggs": {
+        "unique_users": {
+          "cardinality": { "field": "userID.keyword" }
         },
-        "aggs": {
-          "unique_users": {
-            "cardinality": { "field": "userId.keyword" }
+        "total_events": {
+          "value_count": { "field": "eventId" }
+        }
+      }
+    },
+
+    // === USER ADOPTION Q2 ===
+    "q2_2025_users": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2025-04-01T00:00:00Z",
+            "lt": "2025-07-01T00:00:00Z"
+          }
+        }
+      },
+      "aggs": {
+        "unique_users": {
+          "cardinality": { "field": "userID.keyword" }
+        },
+        "total_events": {
+          "value_count": { "field": "eventId" }
+        }
+      }
+    },
+
+    // === ROLE ADOPTION Q1 ===
+    "q1_role_adoption": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2025-01-01T00:00:00Z",
+            "lt": "2025-04-01T00:00:00Z"
+          }
+        }
+      },
+      "aggs": {
+        "by_role": {
+          "terms": {
+            "field": "role.keyword",
+            "size": 20
           },
-          "total_events": {
-            "value_count": { "field": "id" }
+          "aggs": {
+            "unique_users": {
+              "cardinality": { "field": "userID.keyword" }
+            }
+          }
+        }
+      }
+    },
+
+    // === ROLE ADOPTION Q2 ===
+    "q2_role_adoption": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2025-04-01T00:00:00Z",
+            "lt": "2025-07-01T00:00:00Z"
           }
         }
       },
-      "q2_2025_users": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-04-01T00:00:00Z",
-              "lt": "2025-07-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "unique_users": {
-            "cardinality": { "field": "userId.keyword" }
+      "aggs": {
+        "by_role": {
+          "terms": {
+            "field": "role.keyword",
+            "size": 20
           },
-          "total_events": {
-            "value_count": { "field": "id" }
+          "aggs": {
+            "unique_users": {
+              "cardinality": { "field": "userID.keyword" }
+            }
           }
         }
       }
     },
 
-    // === ROLE-BASED ADOPTION ===
-    "role_adoption_comparison": {
-      "q1_by_role": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-01-01T00:00:00Z",
-              "lt": "2025-04-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "roles": {
-            "terms": {
-              "field": "role.keyword",
-              "size": 20
-            },
-            "aggs": {
-              "unique_users": {
-                "cardinality": { "field": "userId.keyword" }
-              },
-              "avg_sessions": {
-                "avg": {
-                  "script": {
-                    "source": "doc['id'].size()"
-                  }
-                }
-              }
-            }
+    // === PAGE POPULARITY Q1 ===
+    "q1_page_popularity": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2025-01-01T00:00:00Z",
+            "lt": "2025-04-01T00:00:00Z"
           }
         }
       },
-      "q2_by_role": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-04-01T00:00:00Z",
-              "lt": "2025-07-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "roles": {
-            "terms": {
-              "field": "role.keyword",
-              "size": 20
-            },
-            "aggs": {
-              "unique_users": {
-                "cardinality": { "field": "userId.keyword" }
-              }
+      "aggs": {
+        "top_pages": {
+          "terms": {
+            "field": "page.keyword",
+            "size": 10
+          },
+          "aggs": {
+            "unique_users": {
+              "cardinality": { "field": "userID.keyword" }
             }
           }
         }
       }
     },
 
-    // === PAGE POPULARITY COMPARISON ===
-    "page_popularity": {
-      "q1_pages": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-01-01T00:00:00Z",
-              "lt": "2025-04-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "top_pages": {
-            "terms": {
-              "field": "page.keyword",
-              "size": 10
-            },
-            "aggs": {
-              "unique_users": {
-                "cardinality": { "field": "userId.keyword" }
-              }
-            }
+    // === PAGE POPULARITY Q2 ===
+    "q2_page_popularity": {
+      "filter": {
+        "range": {
+          "timestamp": {
+            "gte": "2025-04-01T00:00:00Z",
+            "lt": "2025-07-01T00:00:00Z"
           }
         }
       },
-      "q2_pages": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-04-01T00:00:00Z",
-              "lt": "2025-07-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "top_pages": {
-            "terms": {
-              "field": "page.keyword",
-              "size": 10
-            },
-            "aggs": {
-              "unique_users": {
-                "cardinality": { "field": "userId.keyword" }
-              }
+      "aggs": {
+        "top_pages": {
+          "terms": {
+            "field": "page.keyword",
+            "size": 10
+          },
+          "aggs": {
+            "unique_users": {
+              "cardinality": { "field": "userID.keyword" }
             }
           }
         }
       }
     },
 
-    // === ROUTE/FEATURE ADOPTION ===
-    "feature_adoption": {
-      "q1_routes": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-01-01T00:00:00Z",
-              "lt": "2025-04-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "popular_routes": {
-            "terms": {
-              "field": "route.keyword",
-              "size": 15
-            }
-          }
-        }
-      },
-      "q2_routes": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-04-01T00:00:00Z",
-              "lt": "2025-07-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "popular_routes": {
-            "terms": {
-              "field": "route.keyword",
-              "size": 15
-            }
-          }
-        }
-      }
-    },
-
-    // === WEEKLY TRENDS ===
+    // === WEEKLY TRENDS (Both Quarters) ===
     "weekly_trends": {
       "filter": {
         "range": {
@@ -210,77 +162,10 @@ GET your-index-name/_search
           },
           "aggs": {
             "unique_users": {
-              "cardinality": { "field": "userId.keyword" }
+              "cardinality": { "field": "userID.keyword" }
             },
-            "events": {
-              "value_count": { "field": "id" }
-            }
-          }
-        }
-      }
-    },
-
-    // === VIEW INTERACTION ANALYSIS ===
-    "view_analysis": {
-      "q1_views": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-01-01T00:00:00Z",
-              "lt": "2025-04-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "view_usage": {
-            "terms": {
-              "field": "view.keyword",
-              "size": 10
-            }
-          }
-        }
-      },
-      "q2_views": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-04-01T00:00:00Z",
-              "lt": "2025-07-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "view_usage": {
-            "terms": {
-              "field": "view.keyword",
-              "size": 10
-            }
-          }
-        }
-      }
-    },
-
-    // === NEW VS RETURNING USERS ===
-    "user_retention": {
-      "q1_user_first_seen": {
-        "filter": {
-          "range": {
-            "timestamp": {
-              "gte": "2025-01-01T00:00:00Z",
-              "lt": "2025-04-01T00:00:00Z"
-            }
-          }
-        },
-        "aggs": {
-          "users_with_first_event": {
-            "terms": {
-              "field": "userId.keyword",
-              "size": 10000
-            },
-            "aggs": {
-              "first_seen": {
-                "min": { "field": "timestamp" }
-              }
+            "total_events": {
+              "value_count": { "field": "eventId" }
             }
           }
         }
@@ -288,4 +173,3 @@ GET your-index-name/_search
     }
   }
 }
-```
