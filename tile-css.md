@@ -67,3 +67,131 @@
   }
 }
 ```
+
+```
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Dashboard</title>
+    <style>
+        body {
+            background: #f5f5f5;
+            padding: 20px;
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        /* Flex container styling */
+        .dashboard-container {
+            display: flex;
+            gap: 40px;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px 0;
+            justify-content: space-between;
+        }
+
+        /* Individual metric item */
+        .metric-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        /* Metric value styling */
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+
+        /* Metric label styling */
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666666;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Status indicator for overall status */
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-left: 8px;
+        }
+
+        .status-healthy {
+            background-color: #27ae60;
+        }
+
+        .status-warning {
+            background-color: #f39c12;
+        }
+
+        .status-critical {
+            background-color: #e74c3c;
+        }
+
+        /* Optional separator lines between metrics */
+        .metric-item:not(:last-child)::after {
+            content: "";
+            position: absolute;
+            right: -20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 1px;
+            height: 60px;
+            background-color: #e0e0e0;
+        }
+
+        .metric-item {
+            position: relative;
+        }
+
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .dashboard-container {
+                flex-direction: column;
+                gap: 24px;
+                text-align: center;
+            }
+            
+            .metric-item::after {
+                display: none;
+            }
+            
+            .metric-value {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="metric-item">
+            <div class="metric-value">24</div>
+            <div class="metric-label">Services</div>
+        </div>
+        
+        <div class="metric-item">
+            <div class="metric-value">18</div>
+            <div class="metric-label">Service Level Objectives</div>
+        </div>
+        
+        <div class="metric-item">
+            <div class="metric-value">
+                Healthy
+                <span class="status-indicator status-healthy"></span>
+            </div>
+            <div class="metric-label">Overall Status</div>
+        </div>
+    </div>
+</body>
+</html>
+```
