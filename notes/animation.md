@@ -270,3 +270,274 @@ const AutomationSpinnerDemo = () => {
 
 export default AutomationSpinnerDemo;
 ```
+
+
+```javascript
+import React from 'react';
+
+const MainLoader = () => {
+  return (
+    <div style={styles.fullScreenContainer}>
+      <div style={styles.loaderWrapper}>
+        <h2 style={styles.loadingText}>Processing...</h2>
+        
+        <div style={styles.assemblyContainer}>
+          {/* Conveyor belt */}
+          <div style={styles.conveyorBelt}>
+            {/* Belt movement indicators */}
+            {[...Array(12)].map((_, i) => (
+              <div
+                key={i}
+                style={{
+                  ...styles.beltIndicator,
+                  left: `${i * 8.33}%`,
+                  animation: `conveyor-move 3s linear ${i * 0.15}s infinite`
+                }}
+              />
+            ))}
+          </div>
+          
+          {/* Robotic arms */}
+          {[0, 1, 2, 3, 4].map((i) => (
+            <div key={i} style={{...styles.robotArmContainer, left: `${15 + i * 17}%`}}>
+              <div 
+                style={{
+                  ...styles.robotArm,
+                  animation: `robot-arm 4s ease-in-out ${i * 0.8}s infinite`
+                }}
+              />
+              <div 
+                style={{
+                  ...styles.robotTip,
+                  animation: `ping 2s cubic-bezier(0, 0, 0.2, 1) ${i * 0.8}s infinite`
+                }}
+              />
+            </div>
+          ))}
+          
+          {/* Code packages moving */}
+          {[...Array(5)].map((_, i) => {
+            const codeSnippets = ['{ }', '< />', 'fn()', '[]', '()'];
+            return (
+              <div
+                key={i}
+                style={{
+                  ...styles.codePackage,
+                  animation: `package-move 6s linear ${i * 2}s infinite`
+                }}
+              >
+                <span style={styles.codeText}>
+                  {codeSnippets[i]}
+                </span>
+                <div style={{...styles.shimmer, animation: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite'}} />
+              </div>
+            );
+          })}
+        </div>
+        
+        <div style={styles.loadingDots}>
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              style={{
+                ...styles.dot,
+                animation: `bounce 1.4s ease-in-out ${i * 0.16}s infinite both`
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      <style>{`
+        @keyframes conveyor-move {
+          0% {
+            transform: translate(-50%, -50%) translateX(-150px);
+          }
+          100% {
+            transform: translate(-50%, -50%) translateX(600px);
+          }
+        }
+        
+        @keyframes robot-arm {
+          0%, 100% {
+            transform: rotate(-20deg);
+          }
+          50% {
+            transform: rotate(20deg);
+          }
+        }
+        
+        @keyframes package-move {
+          0% {
+            left: -80px;
+          }
+          100% {
+            left: calc(100% + 80px);
+          }
+        }
+        
+        @keyframes ping {
+          75%, 100% {
+            transform: translate(-50%, -50%) scale(2.5);
+            opacity: 0;
+          }
+        }
+        
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.3;
+          }
+        }
+        
+        @keyframes bounce {
+          0%, 80%, 100% {
+            transform: scale(0);
+          }
+          40% {
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes fadeIn {
+          from {
+            opacity: 0;
+            transform: translateY(20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+    </div>
+  );
+};
+
+const styles = {
+  fullScreenContainer: {
+    position: 'fixed',
+    top: 0,
+    left: 0,
+    width: '100vw',
+    height: '100vh',
+    background: 'linear-gradient(135deg, #0f172a 0%, #1e3a8a 30%, #312e81 70%, #1e1b4b 100%)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    zIndex: 9999
+  },
+  loaderWrapper: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '40px',
+    animation: 'fadeIn 0.8s ease-out'
+  },
+  loadingText: {
+    color: 'white',
+    fontSize: '32px',
+    fontWeight: 'bold',
+    margin: 0,
+    textAlign: 'center',
+    background: 'linear-gradient(45deg, #60a5fa, #a78bfa, #ec4899)',
+    backgroundClip: 'text',
+    WebkitBackgroundClip: 'text',
+    WebkitTextFillColor: 'transparent',
+    animation: 'pulse 2s ease-in-out infinite'
+  },
+  assemblyContainer: {
+    position: 'relative',
+    width: '500px',
+    height: '120px'
+  },
+  conveyorBelt: {
+    position: 'absolute',
+    bottom: '0',
+    width: '100%',
+    height: '32px',
+    background: 'linear-gradient(to right, #4b5563, #374151, #4b5563)',
+    borderRadius: '16px',
+    border: '2px solid #6b7280',
+    boxShadow: '0 8px 32px rgba(0, 0, 0, 0.3), inset 0 2px 8px rgba(255, 255, 255, 0.1)'
+  },
+  beltIndicator: {
+    position: 'absolute',
+    top: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '8px',
+    height: '16px',
+    backgroundColor: '#fbbf24',
+    borderRadius: '4px',
+    boxShadow: '0 0 12px rgba(251, 191, 36, 0.6)'
+  },
+  robotArmContainer: {
+    position: 'absolute',
+    bottom: '100px'
+  },
+  robotArm: {
+    width: '8px',
+    height: '60px',
+    background: 'linear-gradient(to bottom, #60a5fa, #2563eb, #1e40af)',
+    borderRadius: '4px',
+    transformOrigin: 'bottom center',
+    boxShadow: '0 0 16px rgba(96, 165, 250, 0.5)'
+  },
+  robotTip: {
+    position: 'absolute',
+    top: '-12px',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
+    width: '20px',
+    height: '20px',
+    backgroundColor: '#f97316',
+    borderRadius: '50%',
+    boxShadow: '0 0 20px rgba(249, 115, 22, 0.8)'
+  },
+  codePackage: {
+    position: 'absolute',
+    bottom: '32px',
+    width: '60px',
+    height: '40px',
+    background: 'linear-gradient(135deg, #2563eb, #7c3aed, #a855f7)',
+    borderRadius: '8px',
+    border: '2px solid #60a5fa',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    boxShadow: '0 8px 32px rgba(59, 130, 246, 0.6)'
+  },
+  codeText: {
+    fontSize: '18px',
+    fontFamily: 'Monaco, Consolas, "Courier New", monospace',
+    color: '#67e8f9',
+    fontWeight: 'bold',
+    textShadow: '0 0 8px rgba(103, 232, 249, 0.8)'
+  },
+  shimmer: {
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    right: '0',
+    bottom: '0',
+    background: 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent)',
+    borderRadius: '8px'
+  },
+  loadingDots: {
+    display: 'flex',
+    gap: '8px',
+    alignItems: 'center'
+  },
+  dot: {
+    width: '12px',
+    height: '12px',
+    borderRadius: '50%',
+    background: 'linear-gradient(45deg, #ec4899, #8b5cf6)',
+    boxShadow: '0 0 16px rgba(236, 72, 153, 0.6)'
+  }
+};
+
+export default MainLoader;
+```
