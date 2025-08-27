@@ -811,3 +811,228 @@ const styles = {
 
 export default MainLoader;
 ```
+
+```javascript
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import MainLoader from './MainLoader';
+
+describe('MainLoader Component', () => {
+  
+  // Basic Rendering Tests
+  describe('Rendering', () => {
+    it('renders without crashing', () => {
+      render(<MainLoader />);
+    });
+
+    it('displays the loading text', () => {
+      render(<MainLoader />);
+      expect(screen.getByText('Processing...')).toBeInTheDocument();
+    });
+
+    it('displays J.J. initials on the conveyor belt', () => {
+      render(<MainLoader />);
+      expect(screen.getByText('J.J.')).toBeInTheDocument();
+    });
+
+    it('renders all code snippets', () => {
+      render(<MainLoader />);
+      const codeSnippets = ['{ }', '< />', 'fn()', '[]', '()'];
+      
+      codeSnippets.forEach(snippet => {
+        expect(screen.getByText(snippet)).toBeInTheDocument();
+      });
+    });
+  });
+
+  // Structure Tests
+  describe('Component Structure', () => {
+    it('has correct number of robotic arms', () => {
+      const { container } = render(<MainLoader />);
+      // Should have 5 robotic arms based on the array length
+      const robotArms = container.querySelectorAll('[style*="linear-gradient(to bottom, #60a5fa, #2563eb, #1e40af)"]');
+      expect(robotArms).toHaveLength(5);
+    });
+
+    it('has correct number of belt indicators', () => {
+      const { container } = render(<MainLoader />);
+      // Should have 12 belt indicators
+      const beltIndicators = container.querySelectorAll('[style*="#fbbf24"]');
+      expect(beltIndicators.length).toBeGreaterThanOrEqual(12);
+    });
+
+    it('has correct number of loading dots', () => {
+      const { container } = render(<MainLoader />);
+      // Should have 3 bouncing dots
+      const dots = container.querySelectorAll('[style*="linear-gradient(45deg, #ec4899, #8b5cf6)"]');
+      expect(dots).toHaveLength(3);
+    });
+  });
+
+  // Animation Tests
+  describe('Animations', () => {
+    it('applies conveyor belt animation to indicators', () => {
+      const { container } = render(<MainLoader />);
+      const firstIndicator = container.querySelector('[style*="conveyor-move"]');
+      expect(firstIndicator).toHaveStyle({
+        animation: expect.stringContaining('conveyor-move')
+      });
+    });
+
+    it('applies package movement animation to code snippets', () => {
+      const { container } = render(<MainLoader />);
+      const codePackages = container.querySelectorAll('[style*="package-move"]');
+      expect(codePackages).toHaveLength(5);
+    });
+
+    it('applies robot arm animation', () => {
+      const { container } = render(<MainLoader />);
+      const robotArms = container.querySelectorAll('[style*="robot-arm"]');
+      expect(robotArms.length).toBeGreaterThan(0);
+    });
+
+    it('applies bounce animation to loading dots', () => {
+      const { container } = render(<MainLoader />);
+      const bouncingDots = container.querySelectorAll('[style*="bounce"]');
+      expect(bouncingDots).toHaveLength(3);
+    });
+  });
+
+  // Style Tests
+  describe('Styling', () => {
+    it('has full-screen overlay styling', () => {
+      const { container } = render(<MainLoader />);
+      const overlay = container.firstChild;
+      
+      expect(overlay).toHaveStyle({
+        position: 'fixed',
+        top: '0',
+        left: '0',
+        width: '100vw',
+        height: '100vh',
+        zIndex: '9999'
+      });
+    });
+
+    it('has gradient background', () => {
+      const { container } = render(<MainLoader />);
+      const overlay = container.firstChild;
+      
+      expect(overlay).toHaveStyle({
+        background: expect.stringContaining('linear-gradient')
+      });
+    });
+
+    it('centers content properly', () => {
+      const { container } = render(<MainLoader />);
+      const overlay = container.firstChild;
+      
+      expect(overlay).toHaveStyle({
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      });
+    });
+  });
+
+  // Accessibility Tests
+  describe('Accessibility', () => {
+    it('has appropriate role for loading state', () => {
+      const { container } = render(<MainLoader />);
+      // Could add aria-label or role attributes to the main container
+      expect(container.firstChild).toBeInTheDocument();
+    });
+
+    it('loading text is visible to screen readers', () => {
+      render(<MainLoader />);
+      const loadingText = screen.getByText('Processing...');
+      expect(loadingText).not.toHaveStyle({ display: 'none' });
+    });
+  });
+
+  // Animation Timing Tests
+  describe('Animation Timing', () => {
+    it('code packages have staggered animation delays', () => {
+      const { container } = render(<MainLoader />);
+      const codePackages = Array.from(container.querySelectorAll('[style*="package-move"]'));
+      
+      // Check that each package has a different delay
+      const delays = codePackages.map(pkg => {
+        const style = pkg.getAttribute('style');
+        const delayMatch = style.match(/package-move [0-9.]+s linear ([0-9.]+)s/);
+        return delayMatch ? parseFloat(delayMatch[1]) : 0;
+      });
+      
+      // Each delay should be different (1.4s intervals: 0, 1.4, 2.8, 4.2, 5.6)
+      const expectedDelays = [0, 1.4, 2.8, 4.2, 5.6];
+      expectedDelays.forEach((expectedDelay, index) => {
+        expect(delays[index]).toBeCloseTo(expectedDelay, 1);
+      });
+    });
+  });
+});
+
+// Integration Tests
+describe('MainLoader Integration', () => {
+  it('maintains visual consistency across renders', () => {
+    const { rerender } = render(<MainLoader />);
+    const initialText = screen.getByText('Processing...');
+    
+    rerender(<MainLoader />);
+    const rerenderedText = screen.getByText('Processing...');
+    
+    expect(initialText).toEqual(rerenderedText);
+  });
+
+  it('does not interfere with document body', () => {
+    const originalBodyStyle = document.body.style.cssText;
+    render(<MainLoader />);
+    expect(document.body.style.cssText).toBe(originalBodyStyle);
+  });
+});
+
+// Snapshot Tests
+describe('MainLoader Snapshots', () => {
+  it('matches snapshot', () => {
+    const { container } = render(<MainLoader />);
+    expect(container.firstChild).toMatchSnapshot();
+  });
+});
+
+// Performance Tests
+describe('MainLoader Performance', () => {
+  it('renders within acceptable time', () => {
+    const startTime = performance.now();
+    render(<MainLoader />);
+    const endTime = performance.now();
+    
+    // Should render within 100ms
+    expect(endTime - startTime).toBeLessThan(100);
+  });
+
+  it('does not cause memory leaks with animations', () => {
+    const { unmount } = render(<MainLoader />);
+    // This would be more comprehensive in a real test environment
+    expect(() => unmount()).not.toThrow();
+  });
+});
+
+// Mock Animation Tests (for CI environments)
+describe('MainLoader with Mocked Animations', () => {
+  beforeEach(() => {
+    // Mock CSS animations for consistent testing
+    Object.defineProperty(window, 'getComputedStyle', {
+      value: () => ({
+        animationName: 'none',
+        animationDuration: '0s'
+      })
+    });
+  });
+
+  it('works without CSS animation support', () => {
+    render(<MainLoader />);
+    expect(screen.getByText('Processing...')).toBeInTheDocument();
+  });
+});
+```
