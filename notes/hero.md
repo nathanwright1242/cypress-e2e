@@ -183,9 +183,8 @@
 
 ```javascript
 import React from 'react';
-import './HeroImage.scss';
 
-const HeroImageV1 = () => {
+const HeroImageV0 = () => {
   return (
     <div className="hero-image">
       {/* Floating background elements */}
@@ -266,76 +265,52 @@ const HeroImageV1 = () => {
 
             {/* Test nodes around the hub */}
             <g className="test-nodes">
-              {/* Cypress Node */}
+              {/* Node 1 */}
               <g transform="translate(150, 80)">
-                <circle cx="0" cy="0" r="28" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
+                <circle cx="0" cy="0" r="25" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
                   <animateTransform attributeName="transform" type="rotate" values="0;360" dur="15s" repeatCount="indefinite"/>
                 </circle>
-                <circle cx="0" cy="0" r="20" fill="#17202A" opacity="0.8"/>
-                <text x="0" y="-8" textAnchor="middle" fill="#00D4AA" fontSize="8" fontWeight="bold">CYPRESS</text>
-                <circle cx="0" cy="4" r="6" fill="none" stroke="#00D4AA" strokeWidth="2"/>
-                <circle cx="0" cy="4" r="3" fill="#00D4AA"/>
+                <text x="0" y="8" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">🧪</text>
               </g>
 
-              {/* Selenium Node */}
+              {/* Node 2 */}
               <g transform="translate(450, 80)">
-                <circle cx="0" cy="0" r="28" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
+                <circle cx="0" cy="0" r="25" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
                   <animateTransform attributeName="transform" type="rotate" values="0;-360" dur="18s" repeatCount="indefinite"/>
                 </circle>
-                <circle cx="0" cy="0" r="20" fill="#17202A" opacity="0.8"/>
-                <text x="0" y="-8" textAnchor="middle" fill="#43B02A" fontSize="8" fontWeight="bold">SELENIUM</text>
-                <rect x="-6" y="0" width="12" height="8" fill="none" stroke="#43B02A" strokeWidth="2" rx="2"/>
-                <circle cx="0" cy="4" r="2" fill="#43B02A"/>
+                <text x="0" y="8" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">🔬</text>
               </g>
 
-              {/* Playwright Node */}
+              {/* Node 3 */}
               <g transform="translate(520, 250)">
-                <circle cx="0" cy="0" r="28" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
+                <circle cx="0" cy="0" r="25" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
                   <animateTransform attributeName="transform" type="rotate" values="0;360" dur="12s" repeatCount="indefinite"/>
                 </circle>
-                <circle cx="0" cy="0" r="20" fill="#17202A" opacity="0.8"/>
-                <text x="0" y="-8" textAnchor="middle" fill="#2EAD33" fontSize="7" fontWeight="bold">PLAYWRIGHT</text>
-                <path d="M-6,-2 L6,-2 L4,2 L6,6 L-6,6 L-4,2 Z" fill="none" stroke="#2EAD33" strokeWidth="2"/>
-                <circle cx="0" cy="2" r="1.5" fill="#2EAD33"/>
+                <text x="0" y="8" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">⚗️</text>
               </g>
 
-              {/* Reporting Node */}
+              {/* Node 4 */}
               <g transform="translate(450, 320)">
-                <circle cx="0" cy="0" r="28" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
+                <circle cx="0" cy="0" r="25" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
                   <animateTransform attributeName="transform" type="rotate" values="0;-360" dur="16s" repeatCount="indefinite"/>
                 </circle>
-                <circle cx="0" cy="0" r="20" fill="#17202A" opacity="0.8"/>
-                <text x="0" y="-8" textAnchor="middle" fill="#FF6B35" fontSize="7" fontWeight="bold">REPORTS</text>
-                <rect x="-6" y="0" width="12" height="8" fill="none" stroke="#FF6B35" strokeWidth="2" rx="1"/>
-                <line x1="-4" y1="2" x2="4" y2="2" stroke="#FF6B35" strokeWidth="1"/>
-                <line x1="-4" y1="4" x2="2" y2="4" stroke="#FF6B35" strokeWidth="1"/>
-                <line x1="-4" y1="6" x2="4" y2="6" stroke="#FF6B35" strokeWidth="1"/>
+                <text x="0" y="8" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">🚀</text>
               </g>
 
-              {/* Bitbucket Node */}
+              {/* Node 5 */}
               <g transform="translate(150, 320)">
-                <circle cx="0" cy="0" r="28" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
+                <circle cx="0" cy="0" r="25" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
                   <animateTransform attributeName="transform" type="rotate" values="0;360" dur="14s" repeatCount="indefinite"/>
                 </circle>
-                <circle cx="0" cy="0" r="20" fill="#17202A" opacity="0.8"/>
-                <text x="0" y="-8" textAnchor="middle" fill="#0052CC" fontSize="7" fontWeight="bold">BITBUCKET</text>
-                <path d="M-6,0 L-2,8 L2,8 L6,0 Z" fill="none" stroke="#0052CC" strokeWidth="2"/>
-                <circle cx="-3" cy="2" r="1" fill="#0052CC"/>
-                <circle cx="3" cy="2" r="1" fill="#0052CC"/>
-                <path d="M-2,4 Q0,6 2,4" stroke="#0052CC" strokeWidth="1" fill="none"/>
+                <text x="0" y="8" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">💻</text>
               </g>
 
-              {/* AWS Node */}
+              {/* Node 6 */}
               <g transform="translate(80, 250)">
-                <circle cx="0" cy="0" r="28" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
+                <circle cx="0" cy="0" r="25" fill="url(#mainGradient)" filter="url(#glow)" opacity="0.9">
                   <animateTransform attributeName="transform" type="rotate" values="0;-360" dur="13s" repeatCount="indefinite"/>
                 </circle>
-                <circle cx="0" cy="0" r="20" fill="#17202A" opacity="0.8"/>
-                <text x="0" y="-8" textAnchor="middle" fill="#FF9900" fontSize="8" fontWeight="bold">AWS</text>
-                <path d="M-6,2 Q-6,6 0,6 Q6,6 6,2" stroke="#FF9900" strokeWidth="2" fill="none"/>
-                <path d="M-4,0 Q0,4 4,0" stroke="#FF9900" strokeWidth="1.5" fill="none"/>
-                <circle cx="-2" cy="1" r="0.5" fill="#FF9900"/>
-                <circle cx="2" cy="1" r="0.5" fill="#FF9900"/>
+                <text x="0" y="8" textAnchor="middle" fill="white" fontSize="20" fontWeight="bold">🔧</text>
               </g>
             </g>
 
@@ -387,6 +362,21 @@ const HeroImageV1 = () => {
               </circle>
               <path id="path3" d="M300,200 L520,250" stroke="none" fill="none"/>
             </g>
+
+            {/* Performance stats overlay */}
+            <g className="stats" transform="translate(450, 30)">
+              <rect x="0" y="0" width="140" height="80" rx="8" fill="rgba(0,0,0,0.7)" stroke="rgba(16,185,129,0.5)" strokeWidth="1"/>
+              <text x="10" y="20" fill="#10b981" fontSize="12" fontWeight="bold">LIVE STATS</text>
+              <text x="10" y="35" fill="white" fontSize="10">Tests/sec: </text>
+              <text x="70" y="35" fill="#10b981" fontSize="10" fontFamily="monospace">
+                <animate attributeName="fontSize" values="10;12;10" dur="2s" repeatCount="indefinite"/>
+                247
+              </text>
+              <text x="10" y="50" fill="white" fontSize="10">Parallel: </text>
+              <text x="70" y="50" fill="#10b981" fontSize="10" fontFamily="monospace">∞</text>
+              <text x="10" y="65" fill="white" fontSize="10">Success: </text>
+              <text x="70" y="65" fill="#10b981" fontSize="10" fontFamily="monospace">98.7%</text>
+            </g>
           </svg>
         </div>
 
@@ -400,5 +390,5 @@ const HeroImageV1 = () => {
   );
 };
 
-export default HeroImageV1;
+export default HeroImageV0;
 ```
