@@ -185,7 +185,7 @@
 import React from 'react';
 import './HeroImage.scss';
 
-const HeroImage = () => {
+const HeroImageV1 = () => {
   return (
     <div className="hero-image">
       {/* Floating background elements */}
@@ -400,5 +400,5 @@ const HeroImage = () => {
   );
 };
 
-export default HeroImage;
+export default HeroImageV1;
 ```
