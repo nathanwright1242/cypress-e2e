@@ -392,3 +392,280 @@ const HeroImageV0 = () => {
 
 export default HeroImageV0;
 ```
+
+## Simple Hero Section 
+
+```javascript
+// HeroSection.jsx
+import React from 'react';
+import PropTypes from 'prop-types';
+import './HeroSection.css';
+
+const HeroSection = ({ 
+  title = "Test Faster. Ship Sooner.",
+  highlightText = "Unlimited Parallelization.",
+  description = "Bring your own test engine. We'll orchestrate and run your certifications with unlimited parallel execution, cutting your testing time by up to 90%.",
+  logoSrc,
+  logoAlt = "Company Logo"
+}) => {
+  return (
+    <section className="hero">
+      <div className="hero-content">
+        <div className="hero-text">
+          <h1>
+            {title}
+            <br />
+            <span className="gradient-text">{highlightText}</span>
+          </h1>
+          
+          <p>{description}</p>
+        </div>
+        
+        <div className="logo-container">
+          {logoSrc ? (
+            <img 
+              src={logoSrc} 
+              alt={logoAlt} 
+              className="logo"
+              data-testid="hero-logo"
+            />
+          ) : (
+            <div className="logo-placeholder" data-testid="logo-placeholder">
+              YOUR LOGO
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  );
+};
+
+HeroSection.propTypes = {
+  title: PropTypes.string,
+  highlightText: PropTypes.string,
+  description: PropTypes.string,
+  logoSrc: PropTypes.string,
+  logoAlt: PropTypes.string
+};
+
+export default HeroSection;
+
+// HeroSection.css
+:root {
+  --primary: #22c55e;
+  --secondary: #16a34a;
+  --accent: #15803d;
+  --light: #ffffff;
+  --text-muted: #cbd5e1;
+}
+
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 0;
+  background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #1f2937 100%);
+  color: var(--light);
+  position: relative;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(34, 197, 94, 0.15) 0%, transparent 50%);
+  z-index: 0;
+}
+
+.hero-content {
+  max-width: 1200px;
+  padding: 0 5%;
+  z-index: 1;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 4rem;
+}
+
+.hero-text {
+  flex: 1;
+  text-align: left;
+}
+
+.logo-container {
+  flex-shrink: 0;
+  animation: slideUp 0.6s ease 0.8s both;
+}
+
+.logo {
+  max-width: 250px;
+  height: auto;
+  display: block;
+}
+
+.logo-placeholder {
+  width: 200px;
+  height: 120px;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: white;
+  letter-spacing: 0.5px;
+  box-shadow: 0 8px 32px rgba(34, 197, 94, 0.4);
+}
+
+.hero h1 {
+  font-size: clamp(2.5rem, 5vw, 4rem);
+  color: var(--light);
+  margin-bottom: 1.5rem;
+  animation: slideUp 0.8s ease 0.2s both;
+  line-height: 1.2;
+  font-weight: 700;
+}
+
+.gradient-text {
+  background: linear-gradient(135deg, #34d399, #10b981);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: inline-block;
+}
+
+.hero p {
+  font-size: 1.3rem;
+  color: var(--text-muted);
+  animation: slideUp 0.8s ease 0.4s both;
+  max-width: 600px;
+  line-height: 1.6;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .hero-content {
+    flex-direction: column;
+    text-align: center;
+    gap: 2rem;
+  }
+
+  .hero-text {
+    text-align: center;
+  }
+
+  .logo-placeholder {
+    width: 150px;
+    height: 90px;
+    font-size: 1.2rem;
+  }
+}
+
+// HeroSection.test.jsx
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import HeroSection from './HeroSection';
+
+describe('HeroSection', () => {
+  test('renders with default props', () => {
+    render(<HeroSection />);
+    
+    expect(screen.getByText('Test Faster. Ship Sooner.')).toBeInTheDocument();
+    expect(screen.getByText('Unlimited Parallelization.')).toBeInTheDocument();
+    expect(screen.getByText(/Bring your own test engine/)).toBeInTheDocument();
+    expect(screen.getByTestId('logo-placeholder')).toBeInTheDocument();
+  });
+
+  test('renders custom content when props provided', () => {
+    const customProps = {
+      title: "Custom Title",
+      highlightText: "Custom Highlight",
+      description: "Custom description text",
+      logoAlt: "Custom Logo Alt"
+    };
+
+    render(<HeroSection {...customProps} />);
+    
+    expect(screen.getByText('Custom Title')).toBeInTheDocument();
+    expect(screen.getByText('Custom Highlight')).toBeInTheDocument();
+    expect(screen.getByText('Custom description text')).toBeInTheDocument();
+  });
+
+  test('renders logo image when logoSrc provided', () => {
+    render(
+      <HeroSection 
+        logoSrc="/path/to/logo.png" 
+        logoAlt="Company Logo" 
+      />
+    );
+    
+    const logo = screen.getByTestId('hero-logo');
+    expect(logo).toBeInTheDocument();
+    expect(logo).toHaveAttribute('src', '/path/to/logo.png');
+    expect(logo).toHaveAttribute('alt', 'Company Logo');
+    expect(screen.queryByTestId('logo-placeholder')).not.toBeInTheDocument();
+  });
+
+  test('renders placeholder when no logoSrc provided', () => {
+    render(<HeroSection />);
+    
+    expect(screen.getByTestId('logo-placeholder')).toBeInTheDocument();
+    expect(screen.queryByTestId('hero-logo')).not.toBeInTheDocument();
+  });
+
+  test('has proper semantic structure', () => {
+    render(<HeroSection />);
+    
+    const section = screen.getByRole('banner', { hidden: true }) || 
+                   document.querySelector('section');
+    const heading = screen.getByRole('heading', { level: 1 });
+    
+    expect(section).toBeInTheDocument();
+    expect(heading).toBeInTheDocument();
+  });
+
+  test('gradient text has proper class', () => {
+    render(<HeroSection />);
+    
+    const gradientText = screen.getByText('Unlimited Parallelization.');
+    expect(gradientText).toHaveClass('gradient-text');
+  });
+});
+
+// Usage Examples:
+// 
+// Basic usage:
+// <HeroSection />
+//
+// With your logo:
+// <HeroSection 
+//   logoSrc="/path/to/your-logo.png"
+//   logoAlt="Your Company Name"
+// />
+//
+// With custom content:
+// <HeroSection 
+//   title="Your Custom Title"
+//   highlightText="Your Highlight"
+//   description="Your custom description"
+//   logoSrc="/path/to/your-logo.png"
+// />
+```
