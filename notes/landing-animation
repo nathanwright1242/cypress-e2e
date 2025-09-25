@@ -1,0 +1,622 @@
+```javascript
+// TestOrchestrationAnimation.jsx
+import React, { useEffect, useState } from 'react';
+
+export const TestOrchestrationAnimation = () => {
+  const [currentStage, setCurrentStage] = useState(0);
+  const [stageProgress, setStageProgress] = useState(0);
+  const [testsRunning, setTestsRunning] = useState(0);
+  const [testsComplete, setTestsComplete] = useState(0);
+
+  useEffect(() => {
+    // Sequential stage progression with progress
+    const progressTimer = setInterval(() => {
+      setStageProgress(prev => {
+        if (prev >= 100) {
+          if (currentStage < 4) {
+            setCurrentStage(current => current + 1);
+            return 0;
+          }
+          return 100;
+        }
+        // Slower progress for stage 3 (DSL Test Engine) - takes 4.5 seconds
+        if (currentStage === 3) {
+          return prev + 2.2;
+        }
+        // Normal speed for other stages - takes 2 seconds
+        return prev + 5;
+      });
+    }, 100);
+
+    // Test counters only when in stage 3
+    const testTimer = setInterval(() => {
+      if (currentStage === 3) {
+        setTestsRunning(prev => Math.min(prev + Math.floor(Math.random() * 100), 1247));
+        setTestsComplete(prev => Math.min(prev + Math.floor(Math.random() * 150), 2847));
+      }
+    }, 300);
+
+    return () => {
+      clearInterval(progressTimer);
+      clearInterval(testTimer);
+    };
+  }, [currentStage]);
+
+  const stages = [
+    { name: 'Certification Request', status: 'Receiving...', icon: '📋' },
+    { name: 'Sandbox Setup', status: 'Provisioning...', icon: '🔧' },
+    { name: 'DSL Test Engine', status: 'Executing...', icon: '⚡' },
+    { name: 'Certification Report', status: 'Generating...', icon: '✅' }
+  ];
+
+  return (
+    <div className="pipeline-container">
+      {/* Header */}
+      <div className="pipeline-header">
+        <h1 className="pipeline-title">
+          Certification <span className="gradient-text">Process</span>
+        </h1>
+      </div>
+
+      {/* Main Pipeline Visualization */}
+      <div className="pipeline-main">
+        {/* Progress Visualization */}
+        <div className="progress-tracker">
+          <div className="progress-stages">
+            {stages.map((stage, index) => (
+              <div 
+                key={index} 
+                className={`progress-stage ${
+                  index < currentStage ? 'completed' : 
+                  index === currentStage ? 'active' : 
+                  'pending'
+                }`}
+                data-testid={`progress-stage-${index}`}
+              >
+                <div className="stage-connector">
+                  <div 
+                    className="connector-fill" 
+                    style={{
+                      width: index < currentStage ? '100%' : 
+                             index === currentStage ? `${stageProgress}%` : 
+                             '0%'
+                    }}
+                  />
+                </div>
+                <div className="stage-indicator">
+                  <div className="indicator-icon">{stage.icon}</div>
+                  <div className="indicator-number">{index + 1}</div>
+                </div>
+                <div className="stage-info">
+                  <div className="stage-name">{stage.name}</div>
+                  {index === currentStage && (
+                    <div className="stage-status">{stage.status}</div>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Pipeline Stages */}
+        <div className="stages-container">
+          <div className="stages-grid">
+            {/* Stage 1: Certification Request */}
+            <div 
+              className={`stage-box stage-request ${currentStage === 1 ? 'active' : currentStage > 1 ? 'completed' : 'waiting'}`}
+              data-testid="stage-request"
+            >
+              <div className="stage-icon-container">
+                <div className="stage-icon stage-icon-blue">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="stage-title">Certification Request</h3>
+              
+              <div className="stage-content">
+                <div className="request-source">
+                  <div className="source-icon github-icon">
+                    <svg fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                    </svg>
+                  </div>
+                  <span>GitHub PR</span>
+                </div>
+                
+                <div className="request-source">
+                  <div className="source-icon custom-logo">
+                    <span>LOGO</span>
+                  </div>
+                  <span>Dashboard</span>
+                </div>
+              </div>
+              
+              {currentStage > 1 && (
+                <div className="stage-status-indicator">
+                  <span className="status-text">✓ Complete</span>
+                </div>
+              )}
+            </div>
+
+            {/* Stage 2: Sandbox Environment */}
+            <div 
+              className={`stage-box stage-sandbox ${currentStage === 2 ? 'active' : currentStage > 2 ? 'completed' : 'waiting'}`}
+              data-testid="stage-sandbox"
+            >
+              <div className="stage-icon-container">
+                <div className="stage-icon stage-icon-purple">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="stage-title">Sandbox Setup</h3>
+              
+              <div className="stage-content">
+                <div className="server-grid">
+                  <div className="server-item">
+                    <div className="server-icon app-server">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M2 5a2 2 0 012-2h12a2 2 0 012 2v10a2 2 0 01-2 2H4a2 2 0 01-2-2V5zm3.293 1.293a1 1 0 011.414 0l3 3a1 1 0 010 1.414l-3 3a1 1 0 01-1.414-1.414L7.586 10 5.293 7.707a1 1 0 010-1.414z"/>
+                      </svg>
+                    </div>
+                    <span>App</span>
+                  </div>
+                  
+                  <div className="server-item">
+                    <div className="server-icon db-server">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M3 12v3c0 1.657 3.134 3 7 3s7-1.343 7-3v-3c0 1.657-3.134 3-7 3s-7-1.343-7-3z"/>
+                        <path d="M3 7v3c0 1.657 3.134 3 7 3s7-1.343 7-3V7c0 1.657-3.134 3-7 3S3 8.657 3 7z"/>
+                      </svg>
+                    </div>
+                    <span>DB</span>
+                  </div>
+                  
+                  <div className="server-item">
+                    <div className="server-icon api-server">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M12.316 3.051a1 1 0 01.633 1.265l-4 12a1 1 0 11-1.898-.632l4-12a1 1 0 011.265-.633z"/>
+                      </svg>
+                    </div>
+                    <span>API</span>
+                  </div>
+                  
+                  <div className="server-item">
+                    <div className="server-icon mock-server">
+                      <svg fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"/>
+                      </svg>
+                    </div>
+                    <span>Mock</span>
+                  </div>
+                </div>
+              </div>
+              
+              {currentStage > 2 && (
+                <div className="stage-status-indicator">
+                  <span className="status-text">✓ Complete</span>
+                </div>
+              )}
+            </div>
+
+            {/* Stage 3: DSL Test Engine */}
+            <div 
+              className={`stage-box stage-engine ${currentStage === 3 ? 'active' : currentStage > 3 ? 'completed' : 'waiting'}`}
+              data-testid="stage-engine"
+            >
+              <div className="stage-icon-container">
+                <div className="stage-icon stage-icon-orange">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="stage-title">DSL Test Engine</h3>
+              
+              <div className="stage-content">
+                <div className="test-frameworks">
+                  {[
+                    { name: 'Cypress', color: '#17202a', symbol: 'Cy' },
+                    { name: 'Playwright', color: '#2ecc71', symbol: 'Pw' },
+                    { name: 'Selenium', color: '#43b02a', symbol: 'Se' },
+                    { name: 'Jest', color: '#c21325', symbol: 'Je' },
+                    { name: 'Mocha', color: '#8d6748', symbol: 'Mo' },
+                    { name: 'WebDriver', color: '#ea5906', symbol: 'Wd' },
+                    { name: 'Puppeteer', color: '#40b5a4', symbol: 'Pp' },
+                    { name: 'TestCafe', color: '#36acf7', symbol: 'Tc' },
+                    { name: 'Cucumber', color: '#23d96c', symbol: 'Cu' }
+                  ].map((framework, i) => (
+                    <div 
+                      key={i}
+                      className={`framework-pod ${currentStage === 3 ? 'running' : ''}`}
+                      style={{
+                        animationDelay: `${i * 0.15}s`,
+                        background: framework.color
+                      }}
+                      title={framework.name}
+                    >
+                      <span className="framework-symbol">{framework.symbol}</span>
+                      <div className="pod-indicator" />
+                    </div>
+                  ))}
+                </div>
+                
+                {currentStage === 3 && (
+                  <div className="test-metrics" data-testid="test-metrics">
+                    <div className="metric-row">
+                      <span className="metric-label">Running:</span>
+                      <span className="metric-value running" data-testid="tests-running">{testsRunning}</span>
+                    </div>
+                    <div className="metric-row">
+                      <span className="metric-label">Complete:</span>
+                      <span className="metric-value complete" data-testid="tests-complete">{testsComplete}</span>
+                    </div>
+                  </div>
+                )}
+              </div>
+              
+              {currentStage > 3 && (
+                <div className="stage-status-indicator">
+                  <span className="status-text">✓ Complete</span>
+                </div>
+              )}
+            </div>
+
+            {/* Stage 4: Report */}
+            <div 
+              className={`stage-box stage-report ${currentStage === 4 ? 'active' : currentStage > 4 ? 'completed' : 'waiting'}`}
+              data-testid="stage-report"
+            >
+              <div className="stage-icon-container">
+                <div className="stage-icon stage-icon-green">
+                  <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+              </div>
+              <h3 className="stage-title">Certification Report</h3>
+              
+              <div className="stage-content">
+                <div className="report-card">
+                  {currentStage === 4 && (
+                    <>
+                      <div className="report-header">
+                        <span className="pass-rate">90%</span>
+                        <p className="pass-label">Pass Rate</p>
+                      </div>
+                      
+                      <div className="report-progress">
+                        <div 
+                          className="report-progress-fill"
+                          style={{ width: '90%' }}
+                        />
+                      </div>
+                      
+                      <div className="report-duration">
+                        Duration: <span className="duration-value">2m 18s</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+              
+              {currentStage > 4 && (
+                <div className="stage-status-indicator">
+                  <span className="status-text">✓ Complete</span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Enhanced Test Assembly Line - Shows after DSL Test Engine stage */}
+        {currentStage >= 3 && (
+          <div className="assembly-line-section" data-testid="assembly-line">
+            <div className="assembly-line-container">
+              {/* Energy Effects */}
+              <div className="energy-field">
+                <div className="energy-wave energy-wave-1" />
+                <div className="energy-wave energy-wave-2" />
+                <div className="energy-wave energy-wave-3" />
+              </div>
+              
+              {/* Main Belt Track */}
+              <div className="belt-track">
+                <div className="belt-pattern" />
+                <div className="belt-rail belt-rail-top" />
+                <div className="belt-rail belt-rail-bottom" />
+                <div className="speed-lines" />
+              </div>
+              
+              {/* Test Framework Packages Moving */}
+              {[
+                { name: 'Cypress', color: '#04c38d', icon: '🌲', type: 'e2e' },
+                { name: 'Playwright', color: '#2ecc71', icon: '🎭', type: 'browser' },
+                { name: 'Selenium', color: '#43b02a', icon: '🤖', type: 'automation' },
+                { name: 'Jest', color: '#c21325', icon: '🃏', type: 'unit' },
+                { name: 'Mocha', color: '#8d6748', icon: '☕', type: 'unit' },
+                { name: 'Puppeteer', color: '#40b5a4', icon: '🎪', type: 'headless' }
+              ].map((framework, i) => (
+                <div
+                  key={i}
+                  className={`test-package framework-package framework-${i}`}
+                  style={{
+                    animationDelay: `${i * 2}s`,
+                    '--package-color': framework.color
+                  }}
+                >
+                  <div className="package-content">
+                    <div className="package-icon">{framework.icon}</div>
+                    <span className="package-label">{framework.name}</span>
+                    <div className="package-type">{framework.type}</div>
+                    <div className="package-glow" />
+                    <div className="package-particles">
+                      <span></span><span></span><span></span>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              
+              {/* Processing Stations with Enhanced Effects */}
+              <div className="assembly-stations">
+                <div className="station station-input">
+                  <div className="station-tower">
+                    <div className="station-arm">
+                      <div className="arm-joint" />
+                      <div className="arm-laser" />
+                    </div>
+                    <div className="station-base">
+                      <div className="base-light" />
+                    </div>
+                  </div>
+                  <div className="station-label">Intake</div>
+                </div>
+                
+                <div className="station station-scan">
+                  <div className="station-tower">
+                    <div className="scanner-ring scanner-ring-1" />
+                    <div className="scanner-ring scanner-ring-2" />
+                    <div className="scanner-beam" />
+                  </div>
+                  <div className="station-label">Scan</div>
+                </div>
+                
+                <div className="station station-process">
+                  <div className="station-tower">
+                    <div className="processor-core">
+                      <div className="core-spin" />
+                      <div className="core-pulse" />
+                    </div>
+                  </div>
+                  <div className="station-label">Execute</div>
+                </div>
+                
+                <div className="station station-validate">
+                  <div className="station-tower">
+                    <div className="validator-check">
+                      <svg viewBox="0 0 24 24">
+                        <path stroke="currentColor" strokeWidth="3" strokeLinecap="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div className="validator-ring" />
+                  </div>
+                  <div className="station-label">Validate</div>
+                </div>
+                
+                <div className="station station-output">
+                  <div className="station-tower">
+                    <div className="output-portal">
+                      <div className="portal-inner" />
+                      <div className="portal-particles">
+                        <span></span><span></span><span></span><span></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="station-label">Output</div>
+                </div>
+              </div>
+              
+              {/* Speed Indicator */}
+              <div className="speed-indicator">
+                <div className="speed-meter">
+                  <div className="speed-fill" style={{ width: '85%' }} />
+                </div>
+                <span className="speed-text">Processing Speed: <strong>850 tests/min</strong></span>
+              </div>
+              
+              {/* Status Lights */}
+              <div className="status-lights">
+                <div className="status-light status-green" />
+                <div className="status-light status-yellow" />
+                <div className="status-light status-green" />
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+export default TestOrchestrationAnimation;
+
+// TestOrchestrationAnimation.test.jsx
+import React from 'react';
+import { render, screen, waitFor, act } from '@testing-library/react';
+import '@testing-library/jest-dom';
+import { TestOrchestrationAnimation } from './TestOrchestrationAnimation';
+
+// Mock timers for testing
+jest.useFakeTimers();
+
+describe('TestOrchestrationAnimation', () => {
+  afterEach(() => {
+    jest.clearAllTimers();
+  });
+
+  test('renders with initial state', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    // Check header
+    expect(screen.getByText('Certification')).toBeInTheDocument();
+    expect(screen.getByText('Process')).toBeInTheDocument();
+    
+    // Check all stages are rendered
+    expect(screen.getByText('Certification Request')).toBeInTheDocument();
+    expect(screen.getByText('Sandbox Setup')).toBeInTheDocument();
+    expect(screen.getByText('DSL Test Engine')).toBeInTheDocument();
+    expect(screen.getByText('Certification Report')).toBeInTheDocument();
+    
+    // Assembly line should not be visible initially
+    expect(screen.queryByTestId('assembly-line')).not.toBeInTheDocument();
+  });
+
+  test('progresses through stages over time', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    // Initially stage 0 (no active stages)
+    const requestStage = screen.getByTestId('stage-request');
+    expect(requestStage).toHaveClass('waiting');
+    
+    // Advance time to trigger stage 1
+    act(() => {
+      jest.advanceTimersByTime(2100);
+    });
+    
+    expect(requestStage).toHaveClass('active');
+  });
+
+  test('shows assembly line when reaching stage 3', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    // Fast-forward to stage 3 (DSL Test Engine)
+    act(() => {
+      jest.advanceTimersByTime(6500); // Enough time to reach stage 3
+    });
+    
+    // Assembly line should now be visible
+    expect(screen.getByTestId('assembly-line')).toBeInTheDocument();
+    
+    // Test metrics should be visible
+    expect(screen.getByTestId('test-metrics')).toBeInTheDocument();
+  });
+
+  test('keeps assembly line visible after stage 3', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    // Fast-forward to stage 4
+    act(() => {
+      jest.advanceTimersByTime(11000); // Enough time to reach stage 4
+    });
+    
+    // Assembly line should still be visible
+    expect(screen.getByTestId('assembly-line')).toBeInTheDocument();
+  });
+
+  test('updates test counters during stage 3', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    // Fast-forward to stage 3
+    act(() => {
+      jest.advanceTimersByTime(6500);
+    });
+    
+    const runningTests = screen.getByTestId('tests-running');
+    const completeTests = screen.getByTestId('tests-complete');
+    
+    const initialRunning = parseInt(runningTests.textContent);
+    const initialComplete = parseInt(completeTests.textContent);
+    
+    // Advance time to trigger test counter updates
+    act(() => {
+      jest.advanceTimersByTime(600);
+    });
+    
+    // Values should have changed
+    expect(parseInt(runningTests.textContent)).toBeGreaterThanOrEqual(initialRunning);
+    expect(parseInt(completeTests.textContent)).toBeGreaterThanOrEqual(initialComplete);
+  });
+
+  test('marks stages as completed correctly', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    // Fast-forward to stage 2
+    act(() => {
+      jest.advanceTimersByTime(4500);
+    });
+    
+    const requestStage = screen.getByTestId('stage-request');
+    const sandboxStage = screen.getByTestId('stage-sandbox');
+    
+    expect(requestStage).toHaveClass('completed');
+    expect(sandboxStage).toHaveClass('active');
+  });
+
+  test('shows correct progress indicators', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    // Check initial progress stages
+    const progressStages = screen.getAllByTestId(/progress-stage-/);
+    expect(progressStages).toHaveLength(4);
+    
+    // All should start as pending except possibly the first
+    progressStages.forEach((stage, index) => {
+      if (index === 0) {
+        expect(stage).toHaveClass('pending');
+      } else {
+        expect(stage).toHaveClass('pending');
+      }
+    });
+    
+    // Advance to stage 1
+    act(() => {
+      jest.advanceTimersByTime(2100);
+    });
+    
+    expect(progressStages[0]).toHaveClass('active');
+  });
+
+  test('displays source integrations', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    expect(screen.getByText('GitHub PR')).toBeInTheDocument();
+    expect(screen.getByText('Dashboard')).toBeInTheDocument();
+  });
+
+  test('shows server infrastructure in sandbox stage', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    expect(screen.getByText('App')).toBeInTheDocument();
+    expect(screen.getByText('DB')).toBeInTheDocument();
+    expect(screen.getByText('API')).toBeInTheDocument();
+    expect(screen.getByText('Mock')).toBeInTheDocument();
+  });
+
+  test('displays all test frameworks', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    const frameworks = ['Cy', 'Pw', 'Se', 'Je', 'Mo', 'Wd', 'Pp', 'Tc', 'Cu'];
+    
+    frameworks.forEach(symbol => {
+      expect(screen.getByText(symbol)).toBeInTheDocument();
+    });
+  });
+
+  test('shows certification report details in final stage', () => {
+    render(<TestOrchestrationAnimation />);
+    
+    // Fast-forward to stage 4
+    act(() => {
+      jest.advanceTimersByTime(11000);
+    });
+    
+    expect(screen.getByText('90%')).toBeInTheDocument();
+    expect(screen.getByText('Pass Rate')).toBeInTheDocument();
+    expect(screen.getByText('Duration:')).toBeInTheDocument();
+    expect(screen.getByText('2m 18s')).toBeInTheDocument();
+  });
+});
+```
