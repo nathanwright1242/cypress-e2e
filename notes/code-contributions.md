@@ -156,13 +156,13 @@ echo "=========================================="
 #!/bin/bash
 
 # Git Monthly Commit and Lines of Code Statistics
-# Usage: ./git_monthly_stats.sh [author_email] [start_date] [end_date]
-# Example: ./git_monthly_stats.sh "john@example.com" "2023-01-01" "2024-12-31"
+# Usage: ./git_monthly_stats.sh [author_email] [start_year-month] [end_year-month]
+# Example: ./git_monthly_stats.sh "john@example.com" "2024-01" "2025-09"
 
 # Set author (optional - leave empty for all authors)
 AUTHOR=${1:-""}
-START_DATE=${2:-"2020-01-01"}
-END_DATE=${3:-$(date +%Y-%m-%d)}
+START_MONTH=${2:-"2024-01"}
+END_MONTH=${3:-"2025-09"}
 
 # Color codes for output
 RED='\033[0;31m'
@@ -173,40 +173,27 @@ NC='\033[0m' # No Color
 
 echo -e "${BLUE}Git Monthly Statistics Report${NC}"
 echo "========================================="
-echo "Period: $START_DATE to $END_DATE"
+echo "Period: $START_MONTH to $END_MONTH"
 if [ -n "$AUTHOR" ]; then
     echo "Author: $AUTHOR"
 fi
 echo "========================================="
 echo ""
 
-# Function to get monthly stats
+# Function to get monthly stats using git log directly
 get_monthly_stats() {
-    local year=$1
-    local month=$2
+    local year_month=$1
     local author_filter=""
     
     if [ -n "$AUTHOR" ]; then
         author_filter="--author=$AUTHOR"
     fi
     
-    # Calculate start and end dates for the month
-    local month_start="$year-$month-01"
-    local next_month=$((10#$month + 1))
-    local next_year=$year
-    
-    if [ $next_month -gt 12 ]; then
-        next_month=1
-        next_year=$((year + 1))
-    fi
-    
-    local month_end=$(printf "%04d-%02d-01" $next_year $next_month)
-    
     # Get commit count for the month
-    local commit_count=$(git rev-list --count --since="$month_start" --before="$month_end" $author_filter HEAD 2>/dev/null || echo 0)
+    local commit_count=$(git log --since="$year_month-01" --until="$year_month-31" $author_filter --format="%H" 2>/dev/null | wc -l | tr -d ' ')
     
     # Get lines added and deleted for the month
-    local stats=$(git log --since="$month_start" --before="$month_end" $author_filter --pretty=tformat: --numstat 2>/dev/null | \
+    local stats=$(git log --since="$year_month-01" --until="$year_month-31" $author_filter --pretty=tformat: --numstat 2>/dev/null | \
         awk '{added+=$1; deleted+=$2} END {printf "%d\t%d", added, deleted}')
     
     local lines_added=$(echo "$stats" | cut -f1)
@@ -216,32 +203,37 @@ get_monthly_stats() {
     lines_added=${lines_added:-0}
     lines_deleted=${lines_deleted:-0}
     
-    echo "$year-$month|$commit_count|$lines_added|$lines_deleted"
+    echo "$year_month|$commit_count|$lines_added|$lines_deleted"
 }
 
-# Function to format number with commas
+# Function to format number with commas (portable)
 format_number() {
-    printf "%'d" $1
+    echo $1 | sed ':a;s/\B[0-9]\{3\}\>/,&/;ta'
 }
 
 # Create header
-printf "%-10s | %-10s | %-12s | %-12s | %-12s\n" "Month" "Commits" "Lines Added" "Lines Deleted" "Net Change"
-printf "%-10s-+-%-10s-+-%-12s-+-%-12s-+-%-12s\n" "----------" "----------" "------------" "------------" "------------"
+printf "%-12s | %-10s | %-12s | %-12s | %-12s\n" "Month" "Commits" "Lines Added" "Lines Deleted" "Net Change"
+printf "%-12s-+-%-10s-+-%-12s-+-%-12s-+-%-12s\n" "------------" "----------" "------------" "------------" "------------"
 
 # Variables for totals
 total_commits=0
 total_added=0
 total_deleted=0
+months_processed=0
 
-# Process each month
-current_date="$START_DATE"
-while [ "$current_date" \< "$END_DATE" ] || [ "$current_date" = "$END_DATE" ]; do
-    year=$(date -d "$current_date" +%Y)
-    month=$(date -d "$current_date" +%m)
-    month_name=$(date -d "$current_date" +%b)
+# Generate list of months to process
+current_year=$(echo $START_MONTH | cut -d'-' -f1)
+current_month=$(echo $START_MONTH | cut -d'-' -f2 | sed 's/^0*//')
+end_year=$(echo $END_MONTH | cut -d'-' -f1)
+end_month=$(echo $END_MONTH | cut -d'-' -f2 | sed 's/^0*//')
+
+while [ $current_year -lt $end_year ] || [ $current_year -eq $end_year -a $current_month -le $end_month ]; do
+    # Format month with leading zero
+    formatted_month=$(printf "%02d" $current_month)
+    year_month="$current_year-$formatted_month"
     
     # Get stats for the month
-    stats=$(get_monthly_stats $year $month)
+    stats=$(get_monthly_stats "$year_month")
     
     # Parse the stats
     IFS='|' read -r month_label commits added deleted <<< "$stats"
@@ -256,6 +248,8 @@ while [ "$current_date" \< "$END_DATE" ] || [ "$current_date" = "$END_DATE" ]; d
     
     # Only print if there's activity
     if [ $commits -gt 0 ]; then
+        months_processed=$((months_processed + 1))
+        
         # Color code the net change
         if [ $net_change -gt 0 ]; then
             net_color=$GREEN
@@ -268,8 +262,8 @@ while [ "$current_date" \< "$END_DATE" ] || [ "$current_date" = "$END_DATE" ]; d
             net_sign=" "
         fi
         
-        printf "%-10s | %-10s | ${GREEN}%-12s${NC} | ${RED}%-12s${NC} | ${net_color}%-12s${NC}\n" \
-            "$month_name $year" \
+        printf "%-12s | %-10s | ${GREEN}%-12s${NC} | ${RED}%-12s${NC} | ${net_color}%-12s${NC}\n" \
+            "$year_month" \
             "$(format_number $commits)" \
             "+$(format_number $added)" \
             "-$(format_number $deleted)" \
@@ -277,7 +271,11 @@ while [ "$current_date" \< "$END_DATE" ] || [ "$current_date" = "$END_DATE" ]; d
     fi
     
     # Move to next month
-    current_date=$(date -d "$current_date + 1 month" +%Y-%m-01)
+    current_month=$((current_month + 1))
+    if [ $current_month -gt 12 ]; then
+        current_month=1
+        current_year=$((current_year + 1))
+    fi
 done
 
 # Calculate total net change
@@ -300,15 +298,14 @@ else
     printf "%-20s: ${YELLOW}%s${NC}\n" "Net Lines Changed" "$(format_number $total_net)"
 fi
 
-# Calculate average per month (only for months with activity)
-months_with_activity=$(git log --since="$START_DATE" --before="$END_DATE" $author_filter --pretty=format:"%Y-%m" 2>/dev/null | sort -u | wc -l)
-if [ $months_with_activity -gt 0 ]; then
-    avg_commits=$((total_commits / months_with_activity))
-    avg_added=$((total_added / months_with_activity))
-    avg_deleted=$((total_deleted / months_with_activity))
+# Calculate averages
+if [ $months_processed -gt 0 ]; then
+    avg_commits=$((total_commits / months_processed))
+    avg_added=$((total_added / months_processed))
+    avg_deleted=$((total_deleted / months_processed))
     
     echo ""
-    echo "Average per active month:"
+    echo "Average per active month ($months_processed months with activity):"
     printf "  %-18s: %s\n" "Commits" "$(format_number $avg_commits)"
     printf "  %-18s: %s\n" "Lines Added" "$(format_number $avg_added)"
     printf "  %-18s: %s\n" "Lines Deleted" "$(format_number $avg_deleted)"
@@ -317,29 +314,49 @@ fi
 # CSV Export Option
 echo ""
 echo "========================================="
-read -p "Export to CSV? (y/n): " export_csv
+echo -n "Export to CSV? (y/n): "
+read export_csv
 if [ "$export_csv" = "y" ] || [ "$export_csv" = "Y" ]; then
     csv_file="git_stats_$(date +%Y%m%d_%H%M%S).csv"
     echo "Month,Commits,Lines Added,Lines Deleted,Net Change" > "$csv_file"
     
     # Re-run the loop for CSV export
-    current_date="$START_DATE"
-    while [ "$current_date" \< "$END_DATE" ] || [ "$current_date" = "$END_DATE" ]; do
-        year=$(date -d "$current_date" +%Y)
-        month=$(date -d "$current_date" +%m)
-        month_label="$year-$month"
+    current_year=$(echo $START_MONTH | cut -d'-' -f1)
+    current_month=$(echo $START_MONTH | cut -d'-' -f2 | sed 's/^0*//')
+    
+    while [ $current_year -lt $end_year ] || [ $current_year -eq $end_year -a $current_month -le $end_month ]; do
+        formatted_month=$(printf "%02d" $current_month)
+        year_month="$current_year-$formatted_month"
         
-        stats=$(get_monthly_stats $year $month)
+        stats=$(get_monthly_stats "$year_month")
         IFS='|' read -r _ commits added deleted <<< "$stats"
         
         if [ $commits -gt 0 ]; then
             net_change=$((added - deleted))
-            echo "$month_label,$commits,$added,$deleted,$net_change" >> "$csv_file"
+            echo "$year_month,$commits,$added,$deleted,$net_change" >> "$csv_file"
         fi
         
-        current_date=$(date -d "$current_date + 1 month" +%Y-%m-01)
+        current_month=$((current_month + 1))
+        if [ $current_month -gt 12 ]; then
+            current_month=1
+            current_year=$((current_year + 1))
+        fi
     done
     
     echo -e "${GREEN}Data exported to $csv_file${NC}"
 fi
+```
+
+```bash
+# Get all commits grouped by month in the date range
+git log --author="<author>" --since="2024-01-01" --until="2025-09-30" \
+  --pretty=format:"%cd" --date=format:"%Y-%m" | 
+  sort | uniq -c | 
+  while read count month; do
+    echo -n "$month: $count commits, "
+    git log --author="<author>" \
+      --since="$month-01" --until="$month-31" \
+      --numstat --format="" | 
+      awk '{add+=$1; del+=$2} END {printf "+%d -%d lines\n", add, del}'
+  done
 ```
