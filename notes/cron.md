@@ -155,3 +155,102 @@ To schedule a task to run immediately using cron, you cannot directly specify "i
 This will execute the task every minute.
 
 If you need a task to run immediately once, you may need to trigger it manually or programmatically before cron handles future schedules.
+
+```javascript
+import React, { useState } from 'react';
+import { Cron } from 'react-js-cron';
+import 'react-js-cron/dist/styles.css';
+
+export default function CronScheduler({ value, onChange }) {
+  const [mode, setMode] = useState('visual'); // 'visual' or 'manual'
+
+  return (
+    <div style={{ width: '100%' }}>
+      {/* Toggle Switch */}
+      <div style={{ 
+        display: 'flex', 
+        alignItems: 'center', 
+        gap: '12px', 
+        marginBottom: '16px' 
+      }}>
+        <span style={{ fontSize: '14px', color: '#666' }}>Mode:</span>
+        <div style={{ 
+          display: 'inline-flex', 
+          border: '1px solid #d9d9d9', 
+          borderRadius: '6px',
+          overflow: 'hidden'
+        }}>
+          <button
+            onClick={() => setMode('visual')}
+            style={{
+              padding: '6px 16px',
+              border: 'none',
+              background: mode === 'visual' ? '#1890ff' : 'white',
+              color: mode === 'visual' ? 'white' : '#666',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: mode === 'visual' ? '600' : '400',
+              transition: 'all 0.2s'
+            }}
+          >
+            Visual Editor
+          </button>
+          <button
+            onClick={() => setMode('manual')}
+            style={{
+              padding: '6px 16px',
+              border: 'none',
+              borderLeft: '1px solid #d9d9d9',
+              background: mode === 'manual' ? '#1890ff' : 'white',
+              color: mode === 'manual' ? 'white' : '#666',
+              cursor: 'pointer',
+              fontSize: '13px',
+              fontWeight: mode === 'manual' ? '600' : '400',
+              transition: 'all 0.2s'
+            }}
+          >
+            Manual Input
+          </button>
+        </div>
+      </div>
+
+      {/* Conditional Rendering Based on Mode */}
+      {mode === 'visual' ? (
+        <Cron
+          value={value}
+          setValue={onChange}
+          mode="multiple"
+          defaultPeriod="day"
+          clockFormat="12-hour-clock"
+          humanizeLabels
+          allowedPeriods={['month', 'week', 'day']}
+          allowedDropdowns={['period', 'months', 'month-days', 'week-days', 'hours', 'minutes']}
+          periodicityOnDoubleClick={false}  // ← Prevents "every X hours" selection
+          allowEmpty="never"
+          clearButtonAction="empty"
+        />
+      ) : (
+        <div>
+          <input
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder="30 17,21 * * *"
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              fontSize: '14px',
+              fontFamily: 'monospace',
+              border: '1px solid #d9d9d9',
+              borderRadius: '4px'
+            }}
+          />
+          <div style={{ marginTop: '8px', fontSize: '12px', color: '#666' }}>
+            <strong>Format:</strong> minute hour day month day-of-week
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+```
