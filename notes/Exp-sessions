@@ -1,0 +1,102 @@
+import React from ‘react’;
+
+const sessionData = [
+{ type: ‘iOS’, used: 1284, total: 2000, icon: ‘📱’, color: ‘#3b82f6’ },
+{ type: ‘Android’, used: 500, total: 2000, icon: ‘🤖’, color: ‘#10b981’ },
+{ type: ‘Web’, used: 4562, total: 5000, icon: ‘🌐’, color: ‘#8b5cf6’ },
+{ type: ‘Desktop’, used: 891, total: 1000, icon: ‘💻’, color: ‘#f59e0b’ },
+];
+
+const styles = {
+container: {
+display: ‘flex’,
+flexDirection: ‘column’,
+gap: ‘20px’,
+width: ‘280px’,
+fontFamily: ‘-apple-system, BlinkMacSystemFont, “Segoe UI”, Roboto, sans-serif’,
+},
+row: {
+display: ‘flex’,
+flexDirection: ‘column’,
+gap: ‘8px’,
+},
+header: {
+display: ‘flex’,
+alignItems: ‘center’,
+justifyContent: ‘space-between’,
+},
+labelGroup: {
+display: ‘flex’,
+alignItems: ‘center’,
+gap: ‘10px’,
+},
+icon: {
+fontSize: ‘18px’,
+},
+label: {
+fontSize: ‘14px’,
+fontWeight: 500,
+color: ‘#e2e8f0’,
+},
+countGroup: {
+display: ‘flex’,
+alignItems: ‘baseline’,
+gap: ‘2px’,
+},
+available: {
+fontSize: ‘15px’,
+fontWeight: 600,
+color: ‘#fff’,
+fontVariantNumeric: ‘tabular-nums’,
+},
+total: {
+fontSize: ‘13px’,
+color: ‘rgba(255,255,255,0.35)’,
+fontVariantNumeric: ‘tabular-nums’,
+},
+track: {
+height: ‘6px’,
+backgroundColor: ‘rgba(255,255,255,0.08)’,
+borderRadius: ‘3px’,
+overflow: ‘hidden’,
+},
+bar: (color, percent) => ({
+height: ‘100%’,
+width: `${percent}%`,
+backgroundColor: color,
+borderRadius: ‘3px’,
+transition: ‘width 0.6s ease-out’,
+}),
+};
+
+export default function SessionAvailability() {
+return (
+<div style={styles.container}>
+{sessionData.map(({ type, used, total, icon, color }) => {
+const available = total - used;
+const percent = (available / total) * 100;
+
+```
+    return (
+      <div key={type} style={styles.row}>
+        <div style={styles.header}>
+          <div style={styles.labelGroup}>
+            <span style={styles.icon}>{icon}</span>
+            <span style={styles.label}>{type}</span>
+          </div>
+          <div style={styles.countGroup}>
+            <span style={styles.available}>{available.toLocaleString()}</span>
+            <span style={styles.total}>/{total.toLocaleString()}</span>
+          </div>
+        </div>
+        <div style={styles.track}>
+          <div style={styles.bar(color, percent)} />
+        </div>
+      </div>
+    );
+  })}
+</div>
+```
+
+);
+}
