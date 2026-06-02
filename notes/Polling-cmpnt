@@ -1,0 +1,197 @@
+import { useState, useEffect, useRef } from "react";
+import { Check, Loader2, RotateCw } from "lucide-react";
+
+// --- tweak these to match your daemon ---
+const DEPS = [
+  { name: "build artifact", meta: "registry.internal/api" },
+  { name: "unit test suite", meta: "jest · 230 specs" },
+  { name: "functional tests", meta: "playwright · staging" },
+  { name: "database migration", meta: "flyway · v0142" },
+  { name: "deploy · staging", meta: "k8s rollout" },
+  { name: "smoke verify", meta: "synthetic probe" },
+];
+const PER_DEP_POLLS = 3; // poll ticks before a dep resolves
+const POLL_MS = 900; // time spent polling each dep
+const TRIGGER_S = 3; // mock "implementation kicking in" delay
+
+const C = {
+  poll: "#ffb14d",
+  ok: "#5ee695",
+  faint: "#475262",
+  dim: "#7c8ba0",
+  line: "#222d3d",
+};
+
+export default function DependencyPolling() {
+  const [phase, setPhase] = useState("idle"); // idle | countdown | polling | done
+  const [countdown, setCountdown] = useState(TRIGGER_S);
+  const [deps, setDeps] = useState(DEPS.map(() => ({ state: "pending", poll: 0 })));
+  const run = useRef(0);
+
+  const setDep = (i, val) =>
+    setDeps((d) => d.map((x, idx) => (idx === i ? val : x)));
+
+  const poll = (idx, my) => {
+    if (run.current !== my) return;
+    if (idx >= DEPS.length) return setPhase("done");
+    setDep(idx, { state: "polling", poll: 0 });
+    let n = 0;
+    const t = setInterval(() => {
+      if (run.current !== my) return clearInterval(t);
+      n++;
+      if (n >= PER_DEP_POLLS) {
+        clearInterval(t);
+        setDep(idx, { state: "ready", poll: n });
+        setTimeout(() => poll(idx + 1, my), 250);
+      } else {
+        setDep(idx, { state: "polling", poll: n });
+      }
+    }, POLL_MS / PER_DEP_POLLS);
+  };
+
+  const start = () => {
+    const my = ++run.current;
+    setDeps(DEPS.map(() => ({ state: "pending", poll: 0 })));
+    setPhase("countdown");
+    let c = TRIGGER_S;
+    setCountdown(c);
+    const cd = setInterval(() => {
+      if (run.current !== my) return clearInterval(cd);
+      c--;
+      if (c <= 0) {
+        clearInterval(cd);
+        setPhase("polling");
+        poll(0, my);
+      } else setCountdown(c);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    start();
+    return () => {
+      run.current++;
+    };
+  }, []);
+
+  const headDot =
+    phase === "done" ? C.ok : phase === "idle" ? C.faint : C.poll;
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[#0a0e14] p-10 font-mono text-slate-100">
+      <div className="w-full max-w-md">
+        {/* header */}
+        <div
+          className="flex items-center gap-3 pb-4 mb-5 border-b"
+          style={{ borderColor: C.line }}
+        >
+          <span
+            className="w-2 h-2 rounded-full transition-colors"
+            style={{
+              background: headDot,
+              boxShadow: phase !== "idle" ? `0 0 10px ${headDot}` : "none",
+              animation: phase === "polling" || phase === "countdown" ? "blink 1.3s infinite" : "none",
+            }}
+          />
+          <span className="text-sm">resolving downstream dependencies</span>
+          <span className="ml-auto text-xs" style={{ color: C.dim }}>
+            {phase === "done" ? "all ready" : phase === "polling" ? "polling" : phase}
+          </span>
+        </div>
+
+        {/* trigger countdown */}
+        {phase === "countdown" && (
+          <div className="text-center text-xs py-6" style={{ color: C.faint }}>
+            starting in <b style={{ color: C.poll }}>{countdown}</b>s…
+          </div>
+        )}
+
+        {/* dependency list */}
+        <ul className="flex flex-col gap-2.5">
+          {DEPS.map((d, i) => {
+            const s = deps[i];
+            const active = s.state !== "pending";
+            const color = s.state === "ready" ? C.ok : s.state === "polling" ? C.poll : C.faint;
+            return (
+              <li
+                key={i}
+                className="flex items-center gap-3.5 px-4 py-3.5 rounded-xl border transition-all duration-300"
+                style={{
+                  background: "#121822",
+                  borderColor: s.state === "ready" ? "rgba(94,230,149,.25)" : C.line,
+                  opacity: active ? 1 : 0.4,
+                }}
+              >
+                {/* icon */}
+                <div
+                  className="w-8 h-8 rounded-full grid place-items-center shrink-0 border-2 transition-all"
+                  style={{
+                    borderColor: color,
+                    color,
+                    background:
+                      s.state === "ready"
+                        ? "rgba(94,230,149,.14)"
+                        : s.state === "polling"
+                        ? "rgba(255,177,77,.16)"
+                        : "transparent",
+                  }}
+                >
+                  {s.state === "ready" ? (
+                    <Check size={15} strokeWidth={3} />
+                  ) : s.state === "polling" ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <span className="text-xs font-bold">{i + 1}</span>
+                  )}
+                </div>
+
+                {/* labels */}
+                <div className="flex-1 min-w-0">
+                  <div className="text-[13px] font-medium truncate">{d.name}</div>
+                  <div
+                    className="text-[10.5px] mt-0.5 transition-colors"
+                    style={{ color: s.state === "polling" ? C.poll : C.faint }}
+                  >
+                    {s.state === "polling"
+                      ? `poll ${s.poll}/${PER_DEP_POLLS} · checking state…`
+                      : s.state === "ready"
+                      ? "resolved · healthy"
+                      : "queued"}
+                  </div>
+                </div>
+
+                {/* tag */}
+                <span
+                  className="text-[9.5px] uppercase tracking-wider font-bold px-2.5 py-1 rounded-md shrink-0"
+                  style={{
+                    color,
+                    background:
+                      s.state === "ready"
+                        ? "rgba(94,230,149,.14)"
+                        : s.state === "polling"
+                        ? "rgba(255,177,77,.16)"
+                        : "#1a2230",
+                  }}
+                >
+                  {s.state === "ready" ? "ready" : s.state === "polling" ? "polling" : "pending"}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+
+        {/* replay */}
+        {phase === "done" && (
+          <button
+            onClick={start}
+            className="mx-auto mt-6 flex items-center gap-2 text-[11px] tracking-wide px-4 py-2 rounded-lg border transition-colors hover:text-amber-300"
+            style={{ borderColor: C.line, color: C.dim }}
+          >
+            <RotateCw size={12} /> replay
+          </button>
+        )}
+      </div>
+
+      <style>{`@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}`}</style>
+    </div>
+  );
+}
